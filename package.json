@@ -1,0 +1,23 @@
+{
+  "name": "dial-hackathon",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "bun run index.ts",
+    "dev": "bun --hot run index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/ws": "^8.18.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@getdial/sdk": "^0.6.4",
+    "ai": "^6.0.202",
+    "ws": "^8.21.0",
+    "zod": "^4.4.3"
+  }
+}
