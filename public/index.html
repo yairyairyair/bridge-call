@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bridge Call — Let our AI make the call for you</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --bg-soft: #1e293b;
+            --card: #ffffff;
+            --ink: #0f172a;
+            --ink-soft: #475569;
+            --line: #e2e8f0;
+            --brand: #4f46e5;
+            --brand-dark: #4338ca;
+            --brand-soft: #eef2ff;
+            --ok: #16a34a;
+            --warn: #d97706;
+            --err: #dc2626;
+            --radius: 16px;
+            --shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(1000px 600px at 10% -10%, #6366f1 0%, transparent 55%),
+                radial-gradient(900px 600px at 110% 10%, #0ea5e9 0%, transparent 50%),
+                var(--bg);
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 40px 20px 80px;
+            line-height: 1.55;
+        }
+
+        .shell { width: 100%; max-width: 760px; }
+
+        header.hero {
+            color: #e2e8f0;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        header.hero .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #c7d2fe;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 8px 16px;
+            border-radius: 999px;
+            margin-bottom: 18px;
+        }
+
+        header.hero .logo .dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: #34d399;
+            box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.25);
+        }
+
+        header.hero h1 {
+            font-size: clamp(28px, 5vw, 40px);
+            margin: 0 0 10px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        header.hero p {
+            margin: 0 auto;
+            max-width: 540px;
+            font-size: 17px;
+            color: #cbd5e1;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 32px;
+        }
+
+        form { display: grid; gap: 22px; }
+
+        .field label {
+            display: block;
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .field .hint {
+            font-weight: 400;
+            color: var(--ink-soft);
+            font-size: 13.5px;
+            margin-bottom: 8px;
+        }
+
+        input[type="tel"],
+        textarea,
+        select {
+            width: 100%;
+            border: 2px solid var(--line);
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 16px;
+            font-family: inherit;
+            color: var(--ink);
+            background: #fff;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        input[type="tel"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--brand);
+            box-shadow: 0 0 0 4px var(--brand-soft);
+        }
+
+        textarea { resize: vertical; min-height: 110px; }
+
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+        @media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
+
+        button.submit {
+            border: none;
+            background: var(--brand);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 16px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.05s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        button.submit:hover:not(:disabled) { background: var(--brand-dark); }
+        button.submit:active:not(:disabled) { transform: translateY(1px); }
+        button.submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .spinner {
+            width: 18px; height: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Live call panel */
+        .panel {
+            margin-top: 26px;
+            border: 2px solid var(--line);
+            border-radius: var(--radius);
+            overflow: hidden;
+            display: none;
+        }
+        .panel.show { display: block; }
+
+        .panel .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--brand-soft);
+            border-bottom: 2px solid var(--line);
+        }
+        .panel .status-bar .pulse {
+            width: 12px; height: 12px; border-radius: 50%;
+            background: var(--brand);
+            box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.5);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.5); }
+            70% { box-shadow: 0 0 0 12px rgba(79, 70, 229, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+        }
+        .panel .status-bar .pulse.done { background: var(--ok); animation: none; }
+        .panel .status-bar .pulse.err { background: var(--err); animation: none; }
+        .panel .status-bar strong { font-size: 16px; }
+        .panel .status-bar .meta { margin-left: auto; color: var(--ink-soft); font-size: 14px; }
+
+        .transcript {
+            padding: 18px 20px;
+            max-height: 360px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f8fafc;
+        }
+        .transcript .empty { color: var(--ink-soft); font-style: italic; }
+
+        .bubble {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 15px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .bubble .who { display: block; font-size: 12px; font-weight: 700; opacity: 0.7; margin-bottom: 2px; }
+        .bubble.agent { align-self: flex-start; background: #fff; border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+        .bubble.other { align-self: flex-end; background: var(--brand); color: #fff; border-bottom-right-radius: 4px; }
+        .bubble.other .who { color: #e0e7ff; }
+
+        .alert {
+            margin-bottom: 18px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            display: none;
+        }
+        .alert.show { display: block; }
+        .alert.error { background: #fef2f2; color: var(--err); border: 1px solid #fecaca; }
+
+        footer.note {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <header class="hero">
+            <div class="logo"><span class="dot"></span> Bridge Call</div>
+            <h1>We'll make the phone call for you</h1>
+            <p>Type the number and what you need. Our AI voice agent calls on your behalf and you follow the whole conversation as live text — no listening required.</p>
+        </header>
+
+        <div class="card">
+            <div id="alert" class="alert error" role="alert" aria-live="assertive"></div>
+
+            <form id="call-form" autocomplete="off">
+                <div class="field">
+                    <label for="to">Phone number to call</label>
+                    <div class="hint">Include the country code, e.g. +1 415 555 0123</div>
+                    <input type="tel" id="to" name="to" placeholder="+1 415 555 0123" required inputmode="tel" />
+                </div>
+
+                <div class="field">
+                    <label for="task">What should the AI do on the call?</label>
+                    <div class="hint">Describe your request in plain language, just like you'd tell a friend.</div>
+                    <textarea id="task" name="task" placeholder="e.g. Book a haircut appointment for this Saturday afternoon. Ask for the earliest opening." required></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="field">
+                        <label for="fromNumberId">Call from</label>
+                        <div class="hint">The number that will show as caller ID.</div>
+                        <select id="fromNumberId" name="fromNumberId">
+                            <option value="">Loading numbers…</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="language">Language</label>
+                        <div class="hint">Language the agent should speak.</div>
+                        <select id="language" name="language">
+                            <option value="">Auto-detect</option>
+                            <option value="en-US">English (US)</option>
+                            <option value="es-ES">Spanish</option>
+                            <option value="fr-FR">French</option>
+                            <option value="de-DE">German</option>
+                            <option value="he-IL">Hebrew</option>
+                            <option value="ar-SA">Arabic</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit" id="submit-btn">
+                    <span class="spinner" id="spinner"></span>
+                    <span id="submit-label">Place the call</span>
+                </button>
+            </form>
+
+            <section class="panel" id="panel" aria-live="polite">
+                <div class="status-bar">
+                    <span class="pulse" id="pulse"></span>
+                    <strong id="status-label">Connecting…</strong>
+                    <span class="meta" id="status-meta"></span>
+                </div>
+                <div class="transcript" id="transcript">
+                    <span class="empty">Waiting for the conversation to begin…</span>
+                </div>
+            </section>
+        </div>
+
+        <footer class="note">Your request is spoken by an AI agent. You stay in control and read every word in real time.</footer>
+    </div>
+
+    <script>
+        const form = document.getElementById("call-form");
+        const submitBtn = document.getElementById("submit-btn");
+        const submitLabel = document.getElementById("submit-label");
+        const spinner = document.getElementById("spinner");
+        const alertBox = document.getElementById("alert");
+        const panel = document.getElementById("panel");
+        const pulse = document.getElementById("pulse");
+        const statusLabel = document.getElementById("status-label");
+        const statusMeta = document.getElementById("status-meta");
+        const transcriptEl = document.getElementById("transcript");
+        const fromSelect = document.getElementById("fromNumberId");
+
+        let eventSource = null;
+
+        // Load available caller-ID numbers into the dropdown.
+        async function loadNumbers() {
+            try {
+                const res = await fetch("/api/numbers");
+                const numbers = await res.json();
+                if (!res.ok) throw new Error(numbers.error || "Could not load numbers");
+                fromSelect.innerHTML = "";
+                if (!numbers.length) {
+                    fromSelect.innerHTML = '<option value="">No numbers available</option>';
+                    return;
+                }
+                for (const n of numbers) {
+                    const opt = document.createElement("option");
+                    opt.value = n.id;
+                    opt.textContent = n.nickname ? `${n.nickname} (${n.number})` : n.number;
+                    fromSelect.appendChild(opt);
+                }
+            } catch (err) {
+                fromSelect.innerHTML = '<option value="">Could not load numbers</option>';
+            }
+        }
+        loadNumbers();
+
+        function showError(msg) {
+            alertBox.textContent = msg;
+            alertBox.classList.add("show");
+        }
+        function clearError() {
+            alertBox.classList.remove("show");
+            alertBox.textContent = "";
+        }
+
+        function setLoading(on) {
+            submitBtn.disabled = on;
+            spinner.style.display = on ? "inline-block" : "none";
+            submitLabel.textContent = on ? "Placing call…" : "Place the call";
+        }
+
+        // Render the live transcript (array of { role, content } from Dial).
+        // role "agent" = our AI calling on your behalf; "user" = the other party.
+        function renderTranscript(transcript) {
+            if (!Array.isArray(transcript) || transcript.length === 0) {
+                transcriptEl.innerHTML = '<span class="empty">Waiting for the conversation to begin…</span>';
+                return;
+            }
+            // Preserve scroll-to-bottom only when the user is already near the bottom.
+            const atBottom = transcriptEl.scrollHeight - transcriptEl.scrollTop - transcriptEl.clientHeight < 60;
+            transcriptEl.innerHTML = "";
+            for (const item of transcript) {
+                const isAgent = item.role === "agent";
+                const who = isAgent ? "Your AI agent" : "Them";
+                const bubble = document.createElement("div");
+                bubble.className = "bubble " + (isAgent ? "agent" : "other");
+                bubble.innerHTML = `<span class="who">${escapeHtml(who)}</span>` + escapeHtml(item.content || "");
+                transcriptEl.appendChild(bubble);
+            }
+            if (atBottom) transcriptEl.scrollTop = transcriptEl.scrollHeight;
+        }
+
+        function escapeHtml(s) {
+            return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+        }
+
+        function setStatus(state, label, meta) {
+            statusLabel.textContent = label;
+            statusMeta.textContent = meta || "";
+            pulse.classList.remove("done", "err");
+            if (state === "done") pulse.classList.add("done");
+            if (state === "err") pulse.classList.add("err");
+        }
+
+        // Subscribe to the live transcript stream for a call.
+        function streamCall(callId) {
+            if (eventSource) { eventSource.close(); eventSource = null; }
+            let gotTranscript = false;
+
+            eventSource = new EventSource(`/api/stream/${encodeURIComponent(callId)}`);
+
+            eventSource.addEventListener("transcript", (e) => {
+                const data = JSON.parse(e.data);
+                if (!gotTranscript && data.transcript?.length) {
+                    gotTranscript = true;
+                    setStatus("live", "Live — on the call", "");
+                }
+                renderTranscript(data.transcript);
+            });
+
+            eventSource.addEventListener("ended", () => {
+                setStatus("done", "Call ended", "");
+                setLoading(false);
+                if (eventSource) { eventSource.close(); eventSource = null; }
+            });
+
+            eventSource.onerror = () => {
+                // EventSource auto-reconnects; surface nothing unless it's fatal.
+                if (eventSource && eventSource.readyState === EventSource.CLOSED) {
+                    setLoading(false);
+                }
+            };
+        }
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            clearError();
+            if (eventSource) { eventSource.close(); eventSource = null; }
+
+            const payload = {
+                to: document.getElementById("to").value,
+                task: document.getElementById("task").value,
+                fromNumberId: fromSelect.value,
+                language: document.getElementById("language").value,
+            };
+
+            setLoading(true);
+            try {
+                const res = await fetch("/api/call", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Could not place the call");
+
+                panel.classList.add("show");
+                setStatus("live", "Calling…", "");
+                transcriptEl.innerHTML = '<span class="empty">Waiting for the conversation to begin…</span>';
+                panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+                streamCall(data.id);
+            } catch (err) {
+                showError(err.message);
+                setLoading(false);
+            }
+        });
+    </script>
+</body>
+</html>
