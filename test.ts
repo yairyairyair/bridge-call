@@ -9,7 +9,7 @@ const call = await dial.makeCall({
     fromNumberId: 'cmq9uck47001i15pdlk9iww64',
     to: '+972527470084',
     outboundInstruction: 'Schedule an appointment at that doctors office for me.',
-    language: 'he-IL',
+    language: 'en-US',
 })
 
 console.log(call);
