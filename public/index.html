@@ -220,6 +220,52 @@
         .bubble.other { align-self: flex-end; background: var(--brand); color: #fff; border-bottom-right-radius: 4px; }
         .bubble.other .who { color: #e0e7ff; }
 
+        /* "AI needs your input" question cards */
+        .asks { display: flex; flex-direction: column; gap: 12px; }
+        .asks:not(:empty) { padding: 16px 20px; border-top: 2px solid var(--line); background: #fffbeb; }
+
+        .ask {
+            border: 2px solid #fcd34d;
+            background: #fffdf5;
+            border-radius: 14px;
+            padding: 14px 16px;
+        }
+        .ask .ask-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: var(--warn);
+            margin-bottom: 4px;
+        }
+        .ask .ask-q { font-weight: 600; margin-bottom: 12px; }
+        .ask .ask-a { color: var(--ink-soft); }
+        .ask.answered { border-color: var(--line); background: #f8fafc; }
+
+        .ask-form { display: flex; gap: 10px; }
+        .ask-input {
+            flex: 1;
+            border: 2px solid var(--line);
+            border-radius: 10px;
+            padding: 11px 13px;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        .ask-input:focus { outline: none; border-color: var(--warn); box-shadow: 0 0 0 4px #fef3c7; }
+        .ask-send {
+            border: none;
+            background: var(--warn);
+            color: #fff;
+            font-weight: 700;
+            font-size: 15px;
+            padding: 0 18px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .ask-send:hover:not(:disabled) { background: #b45309; }
+        .ask-send:disabled { opacity: 0.6; cursor: not-allowed; }
+
         .alert {
             margin-bottom: 18px;
             padding: 14px 16px;
@@ -301,6 +347,7 @@
                 <div class="transcript" id="transcript">
                     <span class="empty">Waiting for the conversation to begin…</span>
                 </div>
+                <div class="asks" id="asks"></div>
             </section>
         </div>
 
@@ -318,9 +365,11 @@
         const statusLabel = document.getElementById("status-label");
         const statusMeta = document.getElementById("status-meta");
         const transcriptEl = document.getElementById("transcript");
+        const asksEl = document.getElementById("asks");
         const fromSelect = document.getElementById("fromNumberId");
 
         let eventSource = null;
+        const renderedQuestions = new Set();
 
         // Load available caller-ID numbers into the dropdown.
         async function loadNumbers() {
@@ -393,6 +442,55 @@
             if (state === "err") pulse.classList.add("err");
         }
 
+        // The AI agent needs input from you mid-call: show an inline answer box.
+        function renderQuestion(questionId, question) {
+            if (renderedQuestions.has(questionId)) return; // de-dupe reconnect replays
+            renderedQuestions.add(questionId);
+
+            const card = document.createElement("div");
+            card.className = "ask";
+            card.innerHTML =
+                '<div class="ask-q"><span class="ask-label">Your AI agent needs your input</span>' +
+                escapeHtml(question) + "</div>";
+
+            const formEl = document.createElement("form");
+            formEl.className = "ask-form";
+            formEl.innerHTML =
+                '<input type="text" class="ask-input" placeholder="Type your answer…" autocomplete="off" required />' +
+                '<button type="submit" class="ask-send">Send</button>';
+            card.appendChild(formEl);
+            asksEl.appendChild(card);
+
+            const input = formEl.querySelector(".ask-input");
+            const sendBtn = formEl.querySelector(".ask-send");
+            input.focus();
+
+            formEl.addEventListener("submit", async (ev) => {
+                ev.preventDefault();
+                const answer = input.value.trim();
+                if (!answer) return;
+                input.disabled = true;
+                sendBtn.disabled = true;
+                try {
+                    const res = await fetch("/api/answer", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ questionId, answer }),
+                    });
+                    if (!res.ok) throw new Error("Could not send your answer");
+                    card.classList.add("answered");
+                    formEl.replaceWith(Object.assign(document.createElement("div"), {
+                        className: "ask-a",
+                        innerHTML: '<span class="ask-label">You answered</span>' + escapeHtml(answer),
+                    }));
+                } catch (err) {
+                    input.disabled = false;
+                    sendBtn.disabled = false;
+                    showError(err.message);
+                }
+            });
+        }
+
         // Subscribe to the live transcript stream for a call.
         function streamCall(callId) {
             if (eventSource) { eventSource.close(); eventSource = null; }
@@ -407,6 +505,11 @@
                     setStatus("live", "Live — on the call", "");
                 }
                 renderTranscript(data.transcript);
+            });
+
+            eventSource.addEventListener("question", (e) => {
+                const { questionId, question } = JSON.parse(e.data);
+                renderQuestion(questionId, question);
             });
 
             eventSource.addEventListener("ended", () => {
@@ -448,6 +551,8 @@
                 panel.classList.add("show");
                 setStatus("live", "Calling…", "");
                 transcriptEl.innerHTML = '<span class="empty">Waiting for the conversation to begin…</span>';
+                asksEl.innerHTML = "";
+                renderedQuestions.clear();
                 panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
 
                 streamCall(data.id);
