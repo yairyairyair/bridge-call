@@ -879,6 +879,14 @@
                 <div class="alert error" id="alert" role="alert" aria-live="assertive"></div>
                 <form id="call-form" autocomplete="off">
                     <div class="form-section">
+                        <div class="form-section-title">About you</div>
+                        <div class="field">
+                            <label for="userName">Your name <span class="req">*</span></label>
+                            <div class="hint">The agent introduces itself on your behalf.</div>
+                            <input type="text" id="userName" placeholder="e.g. Sarah Cohen" required autofocus />
+                        </div>
+                    </div>
+                    <div class="form-section">
                         <div class="form-section-title">Who to call</div>
                         <div class="field">
                             <label for="to">Phone number <span class="req">*</span></label>
@@ -895,27 +903,20 @@
                         </div>
                     </div>
                     <div class="form-section">
-                        <div class="form-section-title">About you</div>
-                        <div class="row">
-                            <div class="field">
-                                <label for="userName">Your name <span class="req">*</span></label>
-                                <div class="hint">The agent introduces itself on your behalf.</div>
-                                <input type="text" id="userName" placeholder="e.g. Sarah Cohen" required />
-                            </div>
-                            <div class="field">
-                                <label for="language">Call language</label>
-                                <div class="hint">Language spoken to the business.</div>
-                                <select id="language">
-                                    <option value="">Auto-detect</option>
-                                    <option value="en-US">English</option>
-                                    <option value="he-IL">Hebrew</option>
-                                    <option value="ar-SA">Arabic</option>
-                                    <option value="es-ES">Spanish</option>
-                                    <option value="fr-FR">French</option>
-                                    <option value="de-DE">German</option>
-                                    <option value="ru-RU">Russian</option>
-                                </select>
-                            </div>
+                        <div class="form-section-title">More details</div>
+                        <div class="field">
+                            <label for="language">Call language</label>
+                            <div class="hint">Language spoken to the business. Leave blank to auto-detect.</div>
+                            <select id="language">
+                                <option value="">Auto-detect</option>
+                                <option value="en-US">English</option>
+                                <option value="he-IL">Hebrew</option>
+                                <option value="ar-SA">Arabic</option>
+                                <option value="es-ES">Spanish</option>
+                                <option value="fr-FR">French</option>
+                                <option value="de-DE">German</option>
+                                <option value="ru-RU">Russian</option>
+                            </select>
                         </div>
                         <div class="field">
                             <label for="additionalInfo">Extra details</label>
