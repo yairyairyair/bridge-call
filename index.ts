@@ -197,32 +197,43 @@ server.on("request", async (req, res) => {
             const body = JSON.parse((await readBody(req)) || "{}") as {
                 to?: string;
                 task?: string;
-                fromNumberId?: string;
+                userName?: string;
+                additionalInfo?: string;
                 language?: string;
             };
 
             const to = body.to?.trim();
             const task = body.task?.trim();
+            const userName = body.userName?.trim();
+            const additionalInfo = body.additionalInfo?.trim();
             if (!to || !task) {
                 sendJson(res, 400, { error: "Both a phone number and a task are required." });
                 return;
             }
-
-            // Default the caller ID to the first available number when not chosen.
-            let fromNumberId = body.fromNumberId?.trim();
-            if (!fromNumberId) {
-                const numbers = await dial.listNumbers();
-                fromNumberId = numbers[0]?.id;
+            if (!userName) {
+                sendJson(res, 400, { error: "Your name is required." });
+                return;
             }
+
+            // The caller ID is the account's number — users don't choose it.
+            const numbers = await dial.listNumbers();
+            const fromNumberId = numbers[0]?.id;
             if (!fromNumberId) {
                 sendJson(res, 400, { error: "No phone number available to call from." });
                 return;
             }
 
+            // Compose a clear instruction the agent runs with on the call.
+            const outboundInstruction = [
+                `You are calling on behalf of ${userName}.`,
+                `Task: ${task}`,
+                additionalInfo ? `Additional information about the user / request: ${additionalInfo}` : "",
+            ].filter(Boolean).join("\n");
+
             const call = await dial.makeCall({
                 to,
                 fromNumberId,
-                outboundInstruction: task,
+                outboundInstruction,
                 language: body.language?.trim() || undefined,
             });
             sendJson(res, 200, { id: call.id, status: call.status });

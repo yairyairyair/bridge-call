@@ -6,20 +6,21 @@
     <title>Bridge Call — Let our AI make the call for you</title>
     <style>
         :root {
-            --bg: #0f172a;
-            --bg-soft: #1e293b;
-            --card: #ffffff;
-            --ink: #0f172a;
-            --ink-soft: #475569;
-            --line: #e2e8f0;
-            --brand: #4f46e5;
-            --brand-dark: #4338ca;
-            --brand-soft: #eef2ff;
-            --ok: #16a34a;
-            --warn: #d97706;
-            --err: #dc2626;
-            --radius: 16px;
-            --shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+            --ink: #3d2b1f;
+            --ink-soft: #8a7363;
+            --line: #ecddcf;
+            --line-strong: #e0cab4;
+            --card: #fffaf5;
+            --brand: #f97316;
+            --brand-dark: #ea580c;
+            --brand-soft: #fff1e4;
+            --brand-ring: rgba(249, 115, 22, 0.18);
+            --them: #f4e7d8;
+            --ok: #15803d;
+            --warn: #c2620b;
+            --err: #c0392b;
+            --radius: 20px;
+            --shadow: 0 24px 70px rgba(120, 53, 15, 0.28);
         }
 
         * { box-sizing: border-box; }
@@ -29,132 +30,131 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             color: var(--ink);
             background:
-                radial-gradient(1000px 600px at 10% -10%, #6366f1 0%, transparent 55%),
-                radial-gradient(900px 600px at 110% 10%, #0ea5e9 0%, transparent 50%),
-                var(--bg);
+                radial-gradient(1100px 700px at 8% -12%, #fdba74 0%, transparent 55%),
+                radial-gradient(900px 650px at 112% 8%, #fb7185 0%, transparent 52%),
+                linear-gradient(160deg, #7c2d12 0%, #9a3412 45%, #b45309 100%);
+            background-attachment: fixed;
             min-height: 100vh;
             display: flex;
             align-items: flex-start;
             justify-content: center;
-            padding: 40px 20px 80px;
+            padding: 48px 20px 90px;
             line-height: 1.55;
         }
 
-        .shell { width: 100%; max-width: 760px; }
+        .shell { width: 100%; max-width: 720px; }
 
         header.hero {
-            color: #e2e8f0;
             text-align: center;
-            margin-bottom: 28px;
+            margin-bottom: 30px;
+            color: #fff;
         }
-
         header.hero .logo {
             display: inline-flex;
             align-items: center;
-            gap: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
             text-transform: uppercase;
-            color: #c7d2fe;
-            background: rgba(255, 255, 255, 0.08);
+            color: #ffedd5;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             padding: 8px 16px;
             border-radius: 999px;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(6px);
         }
-
-        header.hero .logo .dot {
-            width: 10px; height: 10px; border-radius: 50%;
-            background: #34d399;
-            box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.25);
-        }
-
+        header.hero .logo svg { width: 16px; height: 16px; }
         header.hero h1 {
-            font-size: clamp(28px, 5vw, 40px);
-            margin: 0 0 10px;
+            font-size: clamp(30px, 5vw, 42px);
+            margin: 0 0 12px;
             font-weight: 800;
-            color: #fff;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
         }
-
         header.hero p {
             margin: 0 auto;
-            max-width: 540px;
-            font-size: 17px;
-            color: #cbd5e1;
+            max-width: 520px;
+            font-size: 16.5px;
+            color: #ffe8d6;
         }
 
         .card {
             background: var(--card);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-            padding: 32px;
+            padding: 34px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
         }
 
-        form { display: grid; gap: 22px; }
+        form { display: grid; gap: 20px; }
 
         .field label {
             display: block;
             font-weight: 700;
-            font-size: 15px;
-            margin-bottom: 8px;
+            font-size: 14.5px;
+            margin-bottom: 7px;
+            color: var(--ink);
         }
-
+        .field label .req { color: var(--brand-dark); margin-left: 3px; }
         .field .hint {
             font-weight: 400;
             color: var(--ink-soft);
-            font-size: 13.5px;
-            margin-bottom: 8px;
+            font-size: 13px;
+            margin-bottom: 9px;
         }
 
         input[type="tel"],
+        input[type="text"],
         textarea,
         select {
             width: 100%;
-            border: 2px solid var(--line);
-            border-radius: 12px;
-            padding: 14px 16px;
+            border: 1.5px solid var(--line-strong);
+            border-radius: 13px;
+            padding: 13px 15px;
             font-size: 16px;
             font-family: inherit;
             color: var(--ink);
             background: #fff;
             transition: border-color 0.15s, box-shadow 0.15s;
         }
-
-        input[type="tel"]:focus,
-        textarea:focus,
-        select:focus {
+        input::placeholder, textarea::placeholder { color: #c4ad98; }
+        input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: var(--brand);
-            box-shadow: 0 0 0 4px var(--brand-soft);
+            box-shadow: 0 0 0 4px var(--brand-ring);
         }
+        textarea { resize: vertical; min-height: 96px; }
 
-        textarea { resize: vertical; min-height: 110px; }
-
-        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         @media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
 
         button.submit {
             border: none;
-            background: var(--brand);
+            background: linear-gradient(135deg, #fb923c 0%, #f97316 55%, #ea580c 100%);
             color: #fff;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 700;
             padding: 16px 20px;
-            border-radius: 12px;
+            border-radius: 13px;
             cursor: pointer;
-            transition: background 0.15s, transform 0.05s;
+            transition: filter 0.15s, transform 0.05s, box-shadow 0.15s;
+            box-shadow: 0 10px 24px rgba(234, 88, 12, 0.35);
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            margin-top: 4px;
         }
-        button.submit:hover:not(:disabled) { background: var(--brand-dark); }
+        button.submit:hover:not(:disabled) { filter: brightness(1.05); box-shadow: 0 12px 28px rgba(234, 88, 12, 0.45); }
         button.submit:active:not(:disabled) { transform: translateY(1px); }
-        button.submit:disabled { opacity: 0.6; cursor: not-allowed; }
+        button.submit:disabled { opacity: 0.65; cursor: not-allowed; box-shadow: none; }
+        button.submit svg { width: 19px; height: 19px; }
 
         .spinner {
             width: 18px; height: 18px;
-            border: 3px solid rgba(255, 255, 255, 0.4);
+            border: 3px solid rgba(255, 255, 255, 0.45);
             border-top-color: #fff;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
@@ -162,135 +162,167 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Live call panel */
+        /* Live call panel — styled like a warm phone conversation */
         .panel {
-            margin-top: 26px;
-            border: 2px solid var(--line);
+            margin-top: 28px;
             border-radius: var(--radius);
             overflow: hidden;
             display: none;
+            border: 1px solid var(--line-strong);
+            box-shadow: 0 8px 28px rgba(120, 53, 15, 0.12);
         }
         .panel.show { display: block; }
 
-        .panel .status-bar {
+        .status-bar {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 16px 20px;
-            background: var(--brand-soft);
-            border-bottom: 2px solid var(--line);
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border-bottom: 1px solid var(--line-strong);
         }
-        .panel .status-bar .pulse {
-            width: 12px; height: 12px; border-radius: 50%;
+        .status-bar .pulse {
+            width: 11px; height: 11px; border-radius: 50%;
             background: var(--brand);
-            box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.5);
+            box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.5);
             animation: pulse 1.5s infinite;
+            flex: none;
         }
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.5); }
-            70% { box-shadow: 0 0 0 12px rgba(79, 70, 229, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.5); }
+            70% { box-shadow: 0 0 0 11px rgba(249, 115, 22, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
         }
-        .panel .status-bar .pulse.done { background: var(--ok); animation: none; }
-        .panel .status-bar .pulse.err { background: var(--err); animation: none; }
-        .panel .status-bar strong { font-size: 16px; }
-        .panel .status-bar .meta { margin-left: auto; color: var(--ink-soft); font-size: 14px; }
+        .status-bar .pulse.done { background: var(--ok); animation: none; }
+        .status-bar .pulse.err { background: var(--err); animation: none; }
+        .status-bar strong { font-size: 15.5px; }
+        .status-bar .meta { margin-left: auto; color: var(--ink-soft); font-size: 13.5px; }
 
         .transcript {
-            padding: 18px 20px;
-            max-height: 360px;
+            padding: 20px;
+            max-height: 380px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            background: #f8fafc;
+            gap: 11px;
+            background: linear-gradient(180deg, #fdf6ee 0%, #f9ece0 100%);
         }
-        .transcript .empty { color: var(--ink-soft); font-style: italic; }
+        .transcript .empty { color: var(--ink-soft); font-style: italic; text-align: center; padding: 16px 0; }
 
         .bubble {
-            max-width: 80%;
+            max-width: 78%;
             padding: 10px 14px;
-            border-radius: 14px;
+            border-radius: 18px;
             font-size: 15px;
             white-space: pre-wrap;
             word-wrap: break-word;
+            box-shadow: 0 1px 2px rgba(120, 53, 15, 0.08);
         }
-        .bubble .who { display: block; font-size: 12px; font-weight: 700; opacity: 0.7; margin-bottom: 2px; }
-        .bubble.agent { align-self: flex-start; background: #fff; border: 1px solid var(--line); border-bottom-left-radius: 4px; }
-        .bubble.other { align-self: flex-end; background: var(--brand); color: #fff; border-bottom-right-radius: 4px; }
-        .bubble.other .who { color: #e0e7ff; }
+        .bubble .who {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            opacity: 0.65;
+            margin-bottom: 3px;
+        }
+        /* Your AI agent = the user's side → orange, right-aligned */
+        .bubble.agent {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+            color: #fff;
+            border-bottom-right-radius: 5px;
+        }
+        .bubble.agent .who { color: #ffe8d3; }
+        /* The other party = received → cream, left-aligned */
+        .bubble.other {
+            align-self: flex-start;
+            background: var(--them);
+            color: #4a3526;
+            border-bottom-left-radius: 5px;
+        }
+        .bubble.other .who { color: #a07a56; }
 
         /* "AI needs your input" question cards */
         .asks { display: flex; flex-direction: column; gap: 12px; }
-        .asks:not(:empty) { padding: 16px 20px; border-top: 2px solid var(--line); background: #fffbeb; }
+        .asks:not(:empty) { padding: 16px 20px; border-top: 1px solid var(--line-strong); background: #fff7ed; }
 
         .ask {
-            border: 2px solid #fcd34d;
-            background: #fffdf5;
+            border: 1.5px solid var(--brand);
+            background: #fffdfb;
             border-radius: 14px;
             padding: 14px 16px;
+            box-shadow: 0 4px 14px rgba(234, 88, 12, 0.12);
         }
         .ask .ask-label {
-            display: block;
-            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.4px;
-            color: var(--warn);
-            margin-bottom: 4px;
+            color: var(--brand-dark);
+            margin-bottom: 6px;
         }
         .ask .ask-q { font-weight: 600; margin-bottom: 12px; }
         .ask .ask-a { color: var(--ink-soft); }
-        .ask.answered { border-color: var(--line); background: #f8fafc; }
+        .ask.answered { border-color: var(--line-strong); background: #faf3ec; box-shadow: none; }
 
         .ask-form { display: flex; gap: 10px; }
         .ask-input {
             flex: 1;
-            border: 2px solid var(--line);
-            border-radius: 10px;
+            border: 1.5px solid var(--line-strong);
+            border-radius: 11px;
             padding: 11px 13px;
             font-size: 15px;
             font-family: inherit;
         }
-        .ask-input:focus { outline: none; border-color: var(--warn); box-shadow: 0 0 0 4px #fef3c7; }
+        .ask-input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-ring); }
         .ask-send {
             border: none;
-            background: var(--warn);
+            background: var(--brand);
             color: #fff;
             font-weight: 700;
             font-size: 15px;
-            padding: 0 18px;
-            border-radius: 10px;
+            padding: 0 20px;
+            border-radius: 11px;
             cursor: pointer;
+            transition: background 0.15s;
         }
-        .ask-send:hover:not(:disabled) { background: #b45309; }
+        .ask-send:hover:not(:disabled) { background: var(--brand-dark); }
         .ask-send:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .alert {
             margin-bottom: 18px;
-            padding: 14px 16px;
+            padding: 13px 16px;
             border-radius: 12px;
-            font-size: 15px;
+            font-size: 14.5px;
             font-weight: 600;
             display: none;
         }
         .alert.show { display: block; }
-        .alert.error { background: #fef2f2; color: var(--err); border: 1px solid #fecaca; }
+        .alert.error { background: #fef2f2; color: var(--err); border: 1px solid #f5c6c0; }
 
         footer.note {
             text-align: center;
-            color: #94a3b8;
+            color: #ffe0c7;
             font-size: 13px;
-            margin-top: 24px;
+            margin-top: 26px;
+            opacity: 0.85;
         }
     </style>
 </head>
 <body>
     <div class="shell">
         <header class="hero">
-            <div class="logo"><span class="dot"></span> Bridge Call</div>
+            <div class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                Bridge Call
+            </div>
             <h1>We'll make the phone call for you</h1>
-            <p>Type the number and what you need. Our AI voice agent calls on your behalf and you follow the whole conversation as live text — no listening required.</p>
+            <p>Tell us who to call and what you need. Our AI agent speaks for you and you follow every word as live text — no listening required.</p>
         </header>
 
         <div class="card">
@@ -298,24 +330,22 @@
 
             <form id="call-form" autocomplete="off">
                 <div class="field">
-                    <label for="to">Phone number to call</label>
+                    <label for="to">Phone number to call <span class="req">*</span></label>
                     <div class="hint">Include the country code, e.g. +1 415 555 0123</div>
                     <input type="tel" id="to" name="to" placeholder="+1 415 555 0123" required inputmode="tel" />
                 </div>
 
                 <div class="field">
-                    <label for="task">What should the AI do on the call?</label>
+                    <label for="task">What should the AI do on the call? <span class="req">*</span></label>
                     <div class="hint">Describe your request in plain language, just like you'd tell a friend.</div>
                     <textarea id="task" name="task" placeholder="e.g. Book a haircut appointment for this Saturday afternoon. Ask for the earliest opening." required></textarea>
                 </div>
 
                 <div class="row">
                     <div class="field">
-                        <label for="fromNumberId">Call from</label>
-                        <div class="hint">The number that will show as caller ID.</div>
-                        <select id="fromNumberId" name="fromNumberId">
-                            <option value="">Loading numbers…</option>
-                        </select>
+                        <label for="userName">Your name <span class="req">*</span></label>
+                        <div class="hint">The agent calls on your behalf.</div>
+                        <input type="text" id="userName" name="userName" placeholder="e.g. Ben Cohen" required />
                     </div>
                     <div class="field">
                         <label for="language">Language</label>
@@ -332,8 +362,15 @@
                     </div>
                 </div>
 
+                <div class="field">
+                    <label for="additionalInfo">Additional information</label>
+                    <div class="hint">Anything the agent might need — your availability, account number, address, preferences, etc.</div>
+                    <textarea id="additionalInfo" name="additionalInfo" placeholder="e.g. I'm free weekdays after 5pm. My membership number is 4821. Prefer a female stylist."></textarea>
+                </div>
+
                 <button type="submit" class="submit" id="submit-btn">
                     <span class="spinner" id="spinner"></span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="submit-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                     <span id="submit-label">Place the call</span>
                 </button>
             </form>
@@ -358,6 +395,7 @@
         const form = document.getElementById("call-form");
         const submitBtn = document.getElementById("submit-btn");
         const submitLabel = document.getElementById("submit-label");
+        const submitIcon = document.getElementById("submit-icon");
         const spinner = document.getElementById("spinner");
         const alertBox = document.getElementById("alert");
         const panel = document.getElementById("panel");
@@ -366,33 +404,9 @@
         const statusMeta = document.getElementById("status-meta");
         const transcriptEl = document.getElementById("transcript");
         const asksEl = document.getElementById("asks");
-        const fromSelect = document.getElementById("fromNumberId");
 
         let eventSource = null;
         const renderedQuestions = new Set();
-
-        // Load available caller-ID numbers into the dropdown.
-        async function loadNumbers() {
-            try {
-                const res = await fetch("/api/numbers");
-                const numbers = await res.json();
-                if (!res.ok) throw new Error(numbers.error || "Could not load numbers");
-                fromSelect.innerHTML = "";
-                if (!numbers.length) {
-                    fromSelect.innerHTML = '<option value="">No numbers available</option>';
-                    return;
-                }
-                for (const n of numbers) {
-                    const opt = document.createElement("option");
-                    opt.value = n.id;
-                    opt.textContent = n.nickname ? `${n.nickname} (${n.number})` : n.number;
-                    fromSelect.appendChild(opt);
-                }
-            } catch (err) {
-                fromSelect.innerHTML = '<option value="">Could not load numbers</option>';
-            }
-        }
-        loadNumbers();
 
         function showError(msg) {
             alertBox.textContent = msg;
@@ -406,6 +420,7 @@
         function setLoading(on) {
             submitBtn.disabled = on;
             spinner.style.display = on ? "inline-block" : "none";
+            submitIcon.style.display = on ? "none" : "inline-block";
             submitLabel.textContent = on ? "Placing call…" : "Place the call";
         }
 
@@ -534,7 +549,8 @@
             const payload = {
                 to: document.getElementById("to").value,
                 task: document.getElementById("task").value,
-                fromNumberId: fromSelect.value,
+                userName: document.getElementById("userName").value,
+                additionalInfo: document.getElementById("additionalInfo").value,
                 language: document.getElementById("language").value,
             };
 
