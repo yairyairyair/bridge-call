@@ -16,23 +16,6 @@ const readline = createInterface({
     output: process.stdout,
 });
 
-/**
- * Reference Self-Hosted server for Dial.
- *
- * Dial opens one WebSocket per call to `wss://<this-server>/<call_id>`, signed
- * with `X-Dial-Signature`. This server verifies the signature, then drives the
- * conversation with the Vercel AI SDK (routed through the Vercel AI Gateway) —
- * streaming tokens back as `response` frames.
- *
- * The focus is **transcript interrupts**: when a newer `response_required`
- * arrives (the caller spoke again), we abort the in-flight model stream and
- * answer the new turn, so the agent never talks over the user. See
- * https://docs.getdial.ai/documentation/platform/self-hosted.
- *
- * Env: PORT (default 8080), OPENAI_API_KEY (Vercel AI Gateway key),
- *      OPENAI_MODEL (default openai/gpt-4o-mini),
- *      DIAL_SIGNING_SECRET (shown once when you enable Self-Hosted).
- */
 
 const PORT = Number(process.env.PORT || 8080);
 const SIGNING_SECRET = process.env.DIAL_SIGNING_SECRET;
@@ -41,12 +24,15 @@ if (!SIGNING_SECRET) throw new Error("DIAL_SIGNING_SECRET is required");
 const model = gateway('google/gemini-2.5-flash');
 
 
-
 // Used until `call_connected` arrives with Dial's per-call instruction (the
 // system_prompt — your outbound/inbound instruction plus Dial's general context
 // like the current time and the voice's gender).
-const DEFAULT_PROMPT =
-    "You are a Yogas Tsedef, a friendly, concise voice agent on a phone call. Keep replies short and natural.";
+const DEFAULT_PROMPT = `You are a Lydia, a friendly, concise voice agent on a phone call. Keep replies short and natural.
+Your goal is to help the user's request and you are NOT talking to the user but you are talking to the business that the user is calling.
+You are basically a bridge between the user and the business, the user a deaf person so he gives you a task to call for him and you are doing that for him.
+If you need any input from the user use the ask_user tool.
+Always answer to the user in the same language as spoken by the user or the business.
+`;
 
 // Appended to the active system prompt so the model knows it can hang up.
 const END_CALL_HINT =
@@ -69,7 +55,7 @@ const TOOLS = {
             answer: z.string().describe("The answer to the question."),
         }),
         execute: async ({ question }) => {
-            // read answer from CLI input
+            // read answer from CLI input, later we will get it from frontend UI
             const answer = await readline.question(`Question from AI: ${question}\nAnswer: `);
             return {
                 answer: `The answer to the question: ${answer}`,
@@ -193,7 +179,7 @@ function handleCall(ws: WebSocket, callId: string): void {
                 // Sent on connect (and reconnect). Use Dial's per-call instruction
                 // (system_prompt + general context) as the system prompt; falls back to
                 // DEFAULT_PROMPT when absent.
-                if (msg.instruction) systemInstruction = msg.instruction;
+                if (msg.instruction) systemInstruction = DEFAULT_PROMPT + `User's request: ${msg.instruction}`;
                 break;
             case "ping_pong":
                 // Keepalive: echo it straight back so Dial knows we're alive.
