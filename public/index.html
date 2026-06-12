@@ -389,6 +389,20 @@
         .step-body strong { display: block; font-size: 14px; margin-bottom: 2px; }
         .step-body span { font-size: 13.5px; color: var(--ink-muted); }
 
+        .home-cta-block { margin-bottom: 28px; }
+        .home-cta-block.bottom {
+            margin-bottom: 0;
+            margin-top: 4px;
+            padding-top: 24px;
+            border-top: 1px solid var(--line);
+        }
+        .home-cta-block .cta-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink-muted);
+            margin: 0 0 10px;
+            text-align: center;
+        }
         .home-cta {
             width: 100%;
             border: none;
@@ -815,6 +829,13 @@
                     An AI agent makes the call in the right language while you follow the entire conversation as live text.
                 </p>
 
+                <div class="home-cta-block">
+                    <button type="button" class="home-cta" data-action="start-call">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        Start a call
+                    </button>
+                </div>
+
                 <div class="icp-cards">
                     <div class="icp-card">
                         <div class="icp-icon">
@@ -861,10 +882,13 @@
                     </div>
                 </div>
 
-                <button class="home-cta" id="home-cta">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                    Start a call
-                </button>
+                <div class="home-cta-block bottom">
+                    <p class="cta-label">Ready to get started?</p>
+                    <button type="button" class="home-cta" data-action="start-call">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        Start a call
+                    </button>
+                </div>
                 <p class="home-foot">No account needed. Your call history stays on this device.</p>
             </div>
         </div>
@@ -1089,7 +1113,9 @@
             mainEl.innerHTML = "";
             const node = document.getElementById("tpl-home").content.cloneNode(true);
             mainEl.appendChild(node);
-            mainEl.querySelector("#home-cta").addEventListener("click", showForm);
+            mainEl.querySelectorAll('[data-action="start-call"]').forEach((btn) => {
+                btn.addEventListener("click", showForm);
+            });
         }
 
         function showForm() {
